@@ -42,7 +42,7 @@ final response = await client.addUri([downloadLink], option);
 3. 获取返回值
 
 ```dart
-final gid = response.asMethod?.data.asStringData?.value;
+final gid = response.getOrNull()?.result.getOrNull()?.value;
 ```
 
 更多用法请参考test中的代码
