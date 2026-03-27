@@ -1,61 +1,42 @@
 import 'package:aria2_api/src/_internal.dart';
-import 'package:aria2_api/src/data.dart';
-import 'package:aria2_api/src/object.dart';
-import 'package:aria2_api/src/response.dart';
+import 'package:aria2_api/src/error.dart';
+import 'package:aria2_api/src/result.dart';
+import 'package:result_dart/result_dart.dart';
 
-extension Aria2ClientResponseHelper on Aria2ClientResponse {
-  Aria2FaultResponse? get asFault => asTOrNull<Aria2FaultResponse>();
+extension Aria2BatchCallHelper on ResultDart<Object, Aria2Error> {
+  List<T>? castListOrNull<T extends Aria2Result>() {
+    final result = getOrNull();
+    if (result != null && result is List) {
+      return result.cast<T>();
+    }
+    return null;
+  }
 
-  Aria2MethodResponse? get asMethod => asTOrNull<Aria2MethodResponse>();
-
-  Aria2Notification? get asNotification => asTOrNull<Aria2Notification>();
+  T? castOrNull<T extends Aria2Result>() {
+    final result = getOrNull();
+    return switch (result) {
+      T t => t,
+      _ => null,
+    };
+  }
 }
 
-extension Aria2ResponseDataHelper on Aria2ResponseData {
-  Aria2IntegerResponseData? get asIntegerData =>
-      asTOrNull<Aria2IntegerResponseData>();
+extension Aria2MultiCallHelper on ResultDart<List, Aria2Error> {
+  List<T>? castListOrNull<T extends Object>() {
+    final result = getOrNull()?.first;
+    if (result != null && result is List) {
+      return result.cast<T>();
+    }
+    return null;
+  }
 
-  Aria2ListResponseData? get asListData => asTOrNull<Aria2ListResponseData>();
-
-  Aria2NotificationResponseData? get asNotificationData =>
-      asTOrNull<Aria2NotificationResponseData>();
-
-  Aria2ObjectResponseData? get asObjectData =>
-      asTOrNull<Aria2ObjectResponseData>();
-
-  Aria2StringResponseData? get asStringData =>
-      asTOrNull<Aria2StringResponseData>();
-}
-
-extension Aria2TypedObjectHelper on Aria2TypedObject {
-  Aria2ErrorObject? get asErrorObject => asTOrNull<Aria2ErrorObject>();
-
-  Aria2DownloadingFileObject? get asFileObject =>
-      asTOrNull<Aria2DownloadingFileObject>();
-
-  Aria2NotificationObject? get asNotificationObject =>
-      asTOrNull<Aria2NotificationObject>();
-
-  Aria2OptionObject? get asOptionObject => asTOrNull<Aria2OptionObject>();
-
-  Aria2DownloadingPeerObject? get asPeerObject =>
-      asTOrNull<Aria2DownloadingPeerObject>();
-
-  Aria2LinkedServerObject? get asServerObject =>
-      asTOrNull<Aria2LinkedServerObject>();
-
-  Aria2SessionInfoObject? get asSessionInfoObject =>
-      asTOrNull<Aria2SessionInfoObject>();
-
-  Aria2GlobalStatObject? get asStatObject => asTOrNull<Aria2GlobalStatObject>();
-
-  Aria2DownloadingStatusObject? get asStatusObject =>
-      asTOrNull<Aria2DownloadingStatusObject>();
-
-  Aria2DownloadingUriObject? get asUriObject =>
-      asTOrNull<Aria2DownloadingUriObject>();
-
-  Aria2VersionObject? get asVersionObject => asTOrNull<Aria2VersionObject>();
+  T? castOrNull<T extends Object>() {
+    final result = getOrNull()?.first;
+    return switch (result) {
+      T t => t,
+      _ => null,
+    };
+  }
 }
 
 extension EnumByAlias<T extends AliasEnumMixin> on Iterable<T> {

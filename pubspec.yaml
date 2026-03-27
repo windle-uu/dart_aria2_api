@@ -12,6 +12,7 @@ dependencies:
   http: ^1.6.0
   uuid: ^4.5.2
   web_socket_channel: ^3.0.3
+  result_dart: ^2.2.0
 
 dev_dependencies:
   lints: ^6.0.0

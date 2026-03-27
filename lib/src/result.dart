@@ -1,4 +1,3 @@
-import 'package:aria2_api/src/_internal.dart';
 import 'package:aria2_api/src/enum.dart';
 import 'package:aria2_api/src/helper.dart';
 import 'package:aria2_api/src/struct.dart';
@@ -10,7 +9,7 @@ T? _buildConversion<T>(dynamic value, T Function(dynamic) converter) {
   return value != null ? converter(value) : null;
 }
 
-class Aria2DownloadingFileObject extends Aria2TypedObject {
+class Aria2DownloadingFileObject extends Aria2ObjectResult {
   final int index;
   final String path;
   final int length;
@@ -27,7 +26,7 @@ class Aria2DownloadingFileObject extends Aria2TypedObject {
     required this.uris,
   });
 
-  Aria2DownloadingFileObject._fromJson(Map<String, dynamic> json)
+  Aria2DownloadingFileObject.fromJson(Map<String, dynamic> json)
     : this(
         index: int.parse(json['index']),
         path: json['path'],
@@ -35,7 +34,7 @@ class Aria2DownloadingFileObject extends Aria2TypedObject {
         completedLength: int.parse(json['completedLength']),
         selected: bool.parse(json['selected']),
         uris: (json['uris'] as List)
-            .map((e) => Aria2DownloadingUriObject._fromJson(e))
+            .map((e) => Aria2DownloadingUriObject.fromJson(e))
             .toList(),
       );
 
@@ -54,7 +53,7 @@ class Aria2DownloadingFileObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {
       'index',
       'path',
@@ -66,7 +65,7 @@ class Aria2DownloadingFileObject extends Aria2TypedObject {
   }
 }
 
-class Aria2DownloadingPeerObject extends Aria2TypedObject {
+class Aria2DownloadingPeerObject extends Aria2ObjectResult {
   final String peerId;
   final String ip;
   final int port;
@@ -89,7 +88,7 @@ class Aria2DownloadingPeerObject extends Aria2TypedObject {
     required this.seeder,
   });
 
-  Aria2DownloadingPeerObject._fromJson(Map<String, dynamic> json)
+  Aria2DownloadingPeerObject.fromJson(Map<String, dynamic> json)
     : this(
         peerId: json['peerId'],
         ip: json['ip'],
@@ -119,7 +118,7 @@ class Aria2DownloadingPeerObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {
       'peerId',
       'ip',
@@ -133,7 +132,7 @@ class Aria2DownloadingPeerObject extends Aria2TypedObject {
   }
 }
 
-class Aria2DownloadingStatusObject extends Aria2TypedObject {
+class Aria2DownloadingStatusObject extends Aria2ObjectResult {
   final String? gid;
   final Aria2DownloadingStatus? status;
   final int? totalLength;
@@ -186,7 +185,7 @@ class Aria2DownloadingStatusObject extends Aria2TypedObject {
     this.verifyIntegrityPending,
   });
 
-  Aria2DownloadingStatusObject._fromJson(Map<String, dynamic> json)
+  Aria2DownloadingStatusObject.fromJson(Map<String, dynamic> json)
     : this(
         gid: json['gid_alias'],
         status: _buildConversion(
@@ -223,7 +222,7 @@ class Aria2DownloadingStatusObject extends Aria2TypedObject {
         files: _buildConversion(
           json['files'],
           (e) => (e as List<dynamic>)
-              .map((f) => Aria2DownloadingFileObject._fromJson(f))
+              .map((f) => Aria2DownloadingFileObject.fromJson(f))
               .toList(),
         ),
         bittorrent: _buildConversion(
@@ -239,6 +238,34 @@ class Aria2DownloadingStatusObject extends Aria2TypedObject {
           (e) => bool.parse(e),
         ),
       );
+
+  @override
+  int get hashCode => Object.hashAll([
+    gid,
+    status,
+    totalLength,
+    completedLength,
+    uploadLength,
+    bitfield,
+    downloadSpeed,
+    uploadSpeed,
+    infoHash,
+    numSeeders,
+    seeder,
+    pieceLength,
+    numPieces,
+    connections,
+    errorCode,
+    errorMessage,
+    followedBy,
+    following,
+    belongsTo,
+    dir,
+    files,
+    bittorrent,
+    verifiedLength,
+    verifyIntegrityPending,
+  ]);
 
   Map<String, dynamic> get jsonMap {
     final result = <String, dynamic>{};
@@ -274,42 +301,40 @@ class Aria2DownloadingStatusObject extends Aria2TypedObject {
   }
 
   @override
+  bool operator ==(Object other) {
+    return other is Aria2DownloadingStatusObject &&
+        other.gid == gid &&
+        other.status == status &&
+        other.totalLength == totalLength &&
+        other.completedLength == completedLength &&
+        other.uploadLength == uploadLength &&
+        other.bitfield == bitfield &&
+        other.downloadSpeed == downloadSpeed &&
+        other.uploadSpeed == uploadSpeed &&
+        other.infoHash == infoHash &&
+        other.numSeeders == numSeeders &&
+        other.seeder == seeder &&
+        other.pieceLength == pieceLength &&
+        other.numPieces == numPieces &&
+        other.connections == connections &&
+        other.errorCode == errorCode &&
+        other.errorMessage == errorMessage &&
+        other.followedBy == followedBy &&
+        other.following == following &&
+        other.belongsTo == belongsTo &&
+        other.dir == dir &&
+        other.files == files &&
+        other.bittorrent == bittorrent &&
+        other.verifiedLength == verifiedLength &&
+        other.verifyIntegrityPending == verifyIntegrityPending;
+  }
+
+  @override
   String toString() {
     return (StringBuffer('$runtimeType(')
           ..writeAll(jsonMap.entries.map((e) => '${e.key}: ${e.value}'), ', ')
           ..write(')'))
         .toString();
-  }
-
-  static bool anyKeyMatch(Set<String> keySet) {
-    return keySet.any(
-      (e) => const {
-        'gid_alias',
-        'status',
-        'totalLength',
-        'completedLength',
-        'uploadLength',
-        'bitfield',
-        'downloadSpeed',
-        'uploadSpeed',
-        'infoHash',
-        'numSeeders',
-        'seeder',
-        'pieceLength',
-        'numPieces',
-        'connections',
-        'errorCode',
-        'errorMessage',
-        'followedBy',
-        'following',
-        'belongsTo',
-        'dir_alias',
-        'files',
-        'bittorrent',
-        'verifiedLength',
-        'verifyIntegrityPending',
-      }.contains(e),
-    );
   }
 
   /// If all parameter are false, keys will be an empty list.
@@ -367,15 +392,46 @@ class Aria2DownloadingStatusObject extends Aria2TypedObject {
       if (verifyIntegrityPending) 'verifyIntegrityPending',
     ];
   }
+
+  static bool _anyKeyMatch(Set<String> keySet) {
+    return keySet.any(
+      (e) => const {
+        'gid_alias',
+        'status',
+        'totalLength',
+        'completedLength',
+        'uploadLength',
+        'bitfield',
+        'downloadSpeed',
+        'uploadSpeed',
+        'infoHash',
+        'numSeeders',
+        'seeder',
+        'pieceLength',
+        'numPieces',
+        'connections',
+        'errorCode',
+        'errorMessage',
+        'followedBy',
+        'following',
+        'belongsTo',
+        'dir_alias',
+        'files',
+        'bittorrent',
+        'verifiedLength',
+        'verifyIntegrityPending',
+      }.contains(e),
+    );
+  }
 }
 
-class Aria2DownloadingUriObject extends Aria2TypedObject {
+class Aria2DownloadingUriObject extends Aria2ObjectResult {
   final String uri;
   final Aria2UriStatus status;
 
   const Aria2DownloadingUriObject({required this.uri, required this.status});
 
-  Aria2DownloadingUriObject._fromJson(Map<String, dynamic> json)
+  Aria2DownloadingUriObject.fromJson(Map<String, dynamic> json)
     : this(
         uri: json['uri'],
         status: Aria2UriStatus.values.byName(json['status']),
@@ -389,34 +445,12 @@ class Aria2DownloadingUriObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {'uri', 'status'});
   }
 }
 
-class Aria2ErrorObject extends Aria2TypedObject {
-  final int code;
-  final String message;
-
-  const Aria2ErrorObject({required this.code, required this.message});
-
-  Aria2ErrorObject._fromJson(Map<String, dynamic> json)
-    : this(code: json['code'], message: json['message']);
-
-  @override
-  String toString() {
-    return (StringBuffer('$runtimeType(')
-          ..writeAll(['code: $code', 'message: $message'], ', ')
-          ..write(')'))
-        .toString();
-  }
-
-  static bool keyMatch(Set<String> keySet) {
-    return _keyMatcher.equals(keySet, const {'code', 'message'});
-  }
-}
-
-class Aria2GlobalStatObject extends Aria2TypedObject {
+class Aria2GlobalStatObject extends Aria2ObjectResult {
   final int downloadSpeed;
   final int uploadSpeed;
   final int numActive;
@@ -433,7 +467,7 @@ class Aria2GlobalStatObject extends Aria2TypedObject {
     required this.numStoppedTotal,
   });
 
-  Aria2GlobalStatObject._fromJson(Map<String, dynamic> json)
+  Aria2GlobalStatObject.fromJson(Map<String, dynamic> json)
     : this(
         downloadSpeed: int.parse(json['downloadSpeed']),
         uploadSpeed: int.parse(json['uploadSpeed']),
@@ -458,7 +492,7 @@ class Aria2GlobalStatObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {
       'downloadSpeed',
       'uploadSpeed',
@@ -470,13 +504,24 @@ class Aria2GlobalStatObject extends Aria2TypedObject {
   }
 }
 
-class Aria2LinkedServerObject extends Aria2TypedObject {
+class Aria2IntegerResult extends Aria2Result {
+  final int value;
+
+  const Aria2IntegerResult(this.value);
+
+  @override
+  String toString() {
+    return value.toString();
+  }
+}
+
+class Aria2LinkedServerObject extends Aria2ObjectResult {
   final int index;
   final List<Aria2LinkedServerInfo> servers;
 
   const Aria2LinkedServerObject({required this.index, required this.servers});
 
-  Aria2LinkedServerObject._fromJson(Map<String, dynamic> json)
+  Aria2LinkedServerObject.fromJson(Map<String, dynamic> json)
     : this(
         index: int.parse(json['index']),
         servers: (json['servers'] as List)
@@ -492,31 +537,54 @@ class Aria2LinkedServerObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {'index', 'servers'});
   }
 }
 
-class Aria2NotificationObject extends Aria2TypedObject {
-  final String gid;
+sealed class Aria2ObjectResult extends Aria2Result {
+  const Aria2ObjectResult();
 
-  Aria2NotificationObject({required this.gid});
+  factory Aria2ObjectResult.build(Map<String, dynamic> json) {
+    final keySet = json.keys.toSet();
 
-  Aria2NotificationObject.fromJson(Map<String, dynamic> json)
-    : this(gid: json['gid']);
+    // all match
+    if (Aria2DownloadingFileObject._keyMatch(keySet)) {
+      return Aria2DownloadingFileObject.fromJson(json);
+    }
+    if (Aria2DownloadingUriObject._keyMatch(keySet)) {
+      return Aria2DownloadingUriObject.fromJson(json);
+    }
+    if (Aria2DownloadingPeerObject._keyMatch(keySet)) {
+      return Aria2DownloadingPeerObject.fromJson(json);
+    }
+    if (Aria2GlobalStatObject._keyMatch(keySet)) {
+      return Aria2GlobalStatObject.fromJson(json);
+    }
+    if (Aria2LinkedServerObject._keyMatch(keySet)) {
+      return Aria2LinkedServerObject.fromJson(json);
+    }
+    if (Aria2SessionInfoObject._keyMatch(keySet)) {
+      return Aria2SessionInfoObject.fromJson(json);
+    }
+    if (Aria2VersionObject._keyMatch(keySet)) {
+      return Aria2VersionObject.fromJson(json);
+    }
 
-  @override
-  String toString() {
-    return (StringBuffer('$runtimeType(')
-          ..write('gid: $gid')
-          ..write(')'))
-        .toString();
+    // any match
+    if (Aria2DownloadingStatusObject._anyKeyMatch(keySet)) {
+      return Aria2DownloadingStatusObject.fromJson(json);
+    }
+    if (Aria2OptionObject._anyKeyMatch(keySet)) {
+      return Aria2OptionObject.fromJson(json);
+    }
+
+    throw FormatException('Wrong json data.', json);
   }
 }
 
 class Aria2OptionObject extends Aria2InputFileOption
-    with ClassConverterMixin<Aria2TypedObject>
-    implements Aria2TypedObject {
+    implements Aria2ObjectResult {
   /// Specify maximum number of files to open in multi-file BitTorrent/Metalink download globally. Default: 100
   final int? btMaxOpenFiles;
 
@@ -698,133 +766,7 @@ class Aria2OptionObject extends Aria2InputFileOption
        saveSession = null,
        serverStatOf = null;
 
-  const Aria2OptionObject.global({
-    super.allProxy,
-    super.allProxyPasswd,
-    super.allProxyUser,
-    super.allowOverwrite,
-    super.allowPieceLengthChange,
-    super.alwaysResume,
-    super.asyncDns,
-    super.autoFileRenaming,
-    super.btEnableHookAfterHashCheck,
-    super.btEnableLpd,
-    super.btExcludeTracker,
-    super.btExternalIP,
-    super.btForceEncryption,
-    super.btHashCheckSeed,
-    super.btLoadSavedMetadata,
-    super.btMaxPeers,
-    super.btMetadataOnly,
-    super.btMinCryptoLevel,
-    super.btPrioritizePiece,
-    super.btRemoveUnselectedFile,
-    super.btRequestPeerSpeedLimit,
-    super.btRequireCrypto,
-    super.btSaveMetadata,
-    super.btSeedUnverified,
-    super.btStopTimeout,
-    super.btTracker,
-    super.btTrackerConnectTimeout,
-    super.btTrackerInterval,
-    super.btTrackerTimeout,
-    super.checkIntegrity,
-    // super.checksum,
-    super.conditionalGet,
-    super.connectTimeout,
-    super.contentDispositionDefaultUtf8,
-    super.aria2Continue,
-    super.dir,
-    super.dryRun,
-    super.enableHttpKeepAlive,
-    super.enableHttpPipelining,
-    super.enableMmap,
-    super.enablePeerExchange,
-    super.fileAllocation,
-    super.followMetalink,
-    super.followTorrent,
-    super.forceSave,
-    super.ftpPasswd,
-    super.ftpPasv,
-    super.ftpProxy,
-    super.ftpProxyPasswd,
-    super.ftpProxyUser,
-    super.ftpReuseConnection,
-    super.ftpType,
-    super.ftpUser,
-    super.gid,
-    super.hashCheckOnly,
-    super.header,
-    super.httpAcceptGzip,
-    super.httpAuthChallenge,
-    super.httpNoCache,
-    super.httpPasswd,
-    super.httpProxy,
-    super.httpProxyPasswd,
-    super.httpProxyUser,
-    super.httpUser,
-    super.httpsProxy,
-    super.httpsProxyPasswd,
-    super.httpsProxyUser,
-    // super.indexOut,
-    super.lowestSpeedLimit,
-    super.maxConnectionPerServer,
-    super.maxDownloadLimit,
-    super.maxFileNotFound,
-    super.maxMmapLimit,
-    super.maxResumeFailureTries,
-    super.maxTries,
-    super.maxUploadLimit,
-    super.metalinkBaseUri,
-    super.metalinkEnableUniqueProtocol,
-    super.metalinkLanguage,
-    super.metalinkLocation,
-    super.metalinkOS,
-    super.metalinkPreferredProtocol,
-    super.metalinkVersion,
-    super.minSplitSize,
-    super.noFileAllocationLimit,
-    super.noNetrc,
-    super.noProxy,
-    // super.out,
-    super.parameterizedUri,
-    // super.pause,
-    super.pauseMetadata,
-    super.pieceLength,
-    super.proxyMethod,
-    super.realtimeChunkChecksum,
-    super.referer,
-    super.remoteTime,
-    super.removeControlFile,
-    super.retryWait,
-    super.reuseUri,
-    super.rpcSaveUploadMetadata,
-    super.seedRatio,
-    super.seedTime,
-    // super.selectFile,
-    super.split,
-    super.sshHostKeyMd,
-    super.streamPieceSelector,
-    super.timeout,
-    super.uriSelector,
-    super.useHead,
-    super.userAgent,
-    this.btMaxOpenFiles,
-    this.downloadResult,
-    this.keepUnfinishedDownloadResult,
-    this.log,
-    this.logLevel,
-    this.maxConcurrentDownloads,
-    this.maxDownloadResult,
-    this.maxOverallDownloadLimit,
-    this.maxOverallUploadLimit,
-    this.optimizeConcurrentDownloads,
-    this.saveCookies,
-    this.saveSession,
-    this.serverStatOf,
-  });
-
-  Aria2OptionObject._fromJson(Map<String, dynamic> json)
+  Aria2OptionObject.fromJson(Map<String, dynamic> json)
     : btMaxOpenFiles = _buildConversion(
         json['bt-max-open-files'],
         (e) => int.parse(e),
@@ -1125,6 +1067,132 @@ class Aria2OptionObject extends Aria2InputFileOption
         userAgent: json['user-agent'],
       );
 
+  const Aria2OptionObject.global({
+    super.allProxy,
+    super.allProxyPasswd,
+    super.allProxyUser,
+    super.allowOverwrite,
+    super.allowPieceLengthChange,
+    super.alwaysResume,
+    super.asyncDns,
+    super.autoFileRenaming,
+    super.btEnableHookAfterHashCheck,
+    super.btEnableLpd,
+    super.btExcludeTracker,
+    super.btExternalIP,
+    super.btForceEncryption,
+    super.btHashCheckSeed,
+    super.btLoadSavedMetadata,
+    super.btMaxPeers,
+    super.btMetadataOnly,
+    super.btMinCryptoLevel,
+    super.btPrioritizePiece,
+    super.btRemoveUnselectedFile,
+    super.btRequestPeerSpeedLimit,
+    super.btRequireCrypto,
+    super.btSaveMetadata,
+    super.btSeedUnverified,
+    super.btStopTimeout,
+    super.btTracker,
+    super.btTrackerConnectTimeout,
+    super.btTrackerInterval,
+    super.btTrackerTimeout,
+    super.checkIntegrity,
+    // super.checksum,
+    super.conditionalGet,
+    super.connectTimeout,
+    super.contentDispositionDefaultUtf8,
+    super.aria2Continue,
+    super.dir,
+    super.dryRun,
+    super.enableHttpKeepAlive,
+    super.enableHttpPipelining,
+    super.enableMmap,
+    super.enablePeerExchange,
+    super.fileAllocation,
+    super.followMetalink,
+    super.followTorrent,
+    super.forceSave,
+    super.ftpPasswd,
+    super.ftpPasv,
+    super.ftpProxy,
+    super.ftpProxyPasswd,
+    super.ftpProxyUser,
+    super.ftpReuseConnection,
+    super.ftpType,
+    super.ftpUser,
+    super.gid,
+    super.hashCheckOnly,
+    super.header,
+    super.httpAcceptGzip,
+    super.httpAuthChallenge,
+    super.httpNoCache,
+    super.httpPasswd,
+    super.httpProxy,
+    super.httpProxyPasswd,
+    super.httpProxyUser,
+    super.httpUser,
+    super.httpsProxy,
+    super.httpsProxyPasswd,
+    super.httpsProxyUser,
+    // super.indexOut,
+    super.lowestSpeedLimit,
+    super.maxConnectionPerServer,
+    super.maxDownloadLimit,
+    super.maxFileNotFound,
+    super.maxMmapLimit,
+    super.maxResumeFailureTries,
+    super.maxTries,
+    super.maxUploadLimit,
+    super.metalinkBaseUri,
+    super.metalinkEnableUniqueProtocol,
+    super.metalinkLanguage,
+    super.metalinkLocation,
+    super.metalinkOS,
+    super.metalinkPreferredProtocol,
+    super.metalinkVersion,
+    super.minSplitSize,
+    super.noFileAllocationLimit,
+    super.noNetrc,
+    super.noProxy,
+    // super.out,
+    super.parameterizedUri,
+    // super.pause,
+    super.pauseMetadata,
+    super.pieceLength,
+    super.proxyMethod,
+    super.realtimeChunkChecksum,
+    super.referer,
+    super.remoteTime,
+    super.removeControlFile,
+    super.retryWait,
+    super.reuseUri,
+    super.rpcSaveUploadMetadata,
+    super.seedRatio,
+    super.seedTime,
+    // super.selectFile,
+    super.split,
+    super.sshHostKeyMd,
+    super.streamPieceSelector,
+    super.timeout,
+    super.uriSelector,
+    super.useHead,
+    super.userAgent,
+    this.btMaxOpenFiles,
+    this.downloadResult,
+    this.keepUnfinishedDownloadResult,
+    this.log,
+    this.logLevel,
+    this.maxConcurrentDownloads,
+    this.maxDownloadResult,
+    this.maxOverallDownloadLimit,
+    this.maxOverallUploadLimit,
+    this.optimizeConcurrentDownloads,
+    this.saveCookies,
+    this.saveSession,
+    this.serverStatOf,
+  });
+
   @override
   Map<String, dynamic> get parametrized {
     final result = <String, dynamic>{};
@@ -1350,7 +1418,7 @@ class Aria2OptionObject extends Aria2InputFileOption
     return result;
   }
 
-  static bool anyKeyMatch(Set<String> keySet) {
+  static bool _anyKeyMatch(Set<String> keySet) {
     return keySet.any(
       (e) => const {
         'all-proxy',
@@ -1481,12 +1549,39 @@ class Aria2OptionObject extends Aria2InputFileOption
   }
 }
 
-class Aria2SessionInfoObject extends Aria2TypedObject {
+sealed class Aria2Result {
+  const Aria2Result();
+
+  factory Aria2Result.build(Aria2Method method, dynamic json) {
+    switch (json) {
+      case String e:
+        return Aria2StringResult(e);
+      case int e:
+        return Aria2IntegerResult(e);
+      case Map<String, dynamic> e:
+        final needsAlias = const {
+          Aria2MethodName.tellStatus,
+          Aria2MethodName.tellActive,
+          Aria2MethodName.tellWaiting,
+          Aria2MethodName.tellStopped,
+        }.contains(method.methodName);
+        // Aria2DownloadingStatusObject 和 Aria2OptionObject 有部分key重合，需要起一个别名
+        if (needsAlias) {
+          if (e.containsKey('gid')) e['gid_alias'] = e.remove('gid');
+          if (e.containsKey('dir')) e['dir_alias'] = e.remove('dir');
+        }
+        return Aria2ObjectResult.build(e);
+    }
+    throw FormatException('Invalid Aria2 result structure', json);
+  }
+}
+
+class Aria2SessionInfoObject extends Aria2ObjectResult {
   final String sessionId;
 
   const Aria2SessionInfoObject({required this.sessionId});
 
-  Aria2SessionInfoObject._fromJson(Map<String, dynamic> json)
+  Aria2SessionInfoObject.fromJson(Map<String, dynamic> json)
     : this(sessionId: json['sessionId']);
 
   @override
@@ -1497,56 +1592,23 @@ class Aria2SessionInfoObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {'sessionId'});
   }
 }
 
-sealed class Aria2TypedObject with ClassConverterMixin<Aria2TypedObject> {
-  const Aria2TypedObject();
+class Aria2StringResult extends Aria2Result {
+  final String value;
 
-  factory Aria2TypedObject.build(Map<String, dynamic> json) {
-    final keySet = json.keys.toSet();
+  const Aria2StringResult(this.value);
 
-    // all match
-    if (Aria2ErrorObject.keyMatch(keySet)) {
-      return Aria2ErrorObject._fromJson(json);
-    }
-    if (Aria2DownloadingFileObject.keyMatch(keySet)) {
-      return Aria2DownloadingFileObject._fromJson(json);
-    }
-    if (Aria2DownloadingUriObject.keyMatch(keySet)) {
-      return Aria2DownloadingUriObject._fromJson(json);
-    }
-    if (Aria2DownloadingPeerObject.keyMatch(keySet)) {
-      return Aria2DownloadingPeerObject._fromJson(json);
-    }
-    if (Aria2GlobalStatObject.keyMatch(keySet)) {
-      return Aria2GlobalStatObject._fromJson(json);
-    }
-    if (Aria2LinkedServerObject.keyMatch(keySet)) {
-      return Aria2LinkedServerObject._fromJson(json);
-    }
-    if (Aria2SessionInfoObject.keyMatch(keySet)) {
-      return Aria2SessionInfoObject._fromJson(json);
-    }
-    if (Aria2VersionObject.keyMatch(keySet)) {
-      return Aria2VersionObject._fromJson(json);
-    }
-
-    // any match
-    if (Aria2DownloadingStatusObject.anyKeyMatch(keySet)) {
-      return Aria2DownloadingStatusObject._fromJson(json);
-    }
-    if (Aria2OptionObject.anyKeyMatch(keySet)) {
-      return Aria2OptionObject._fromJson(json);
-    }
-
-    throw FormatException('Wrong json data.', json);
+  @override
+  String toString() {
+    return value;
   }
 }
 
-class Aria2VersionObject extends Aria2TypedObject {
+class Aria2VersionObject extends Aria2ObjectResult {
   final String version;
   final List<String> enabledFeatures;
 
@@ -1555,7 +1617,7 @@ class Aria2VersionObject extends Aria2TypedObject {
     required this.enabledFeatures,
   });
 
-  Aria2VersionObject._fromJson(Map<String, dynamic> json)
+  Aria2VersionObject.fromJson(Map<String, dynamic> json)
     : this(
         version: json['version'],
         enabledFeatures: (json['enabledFeatures'] as List).cast<String>(),
@@ -1572,7 +1634,24 @@ class Aria2VersionObject extends Aria2TypedObject {
         .toString();
   }
 
-  static bool keyMatch(Set<String> keySet) {
+  static bool _keyMatch(Set<String> keySet) {
     return _keyMatcher.equals(keySet, const {'version', 'enabledFeatures'});
+  }
+}
+
+class Aria2NotificationObject {
+  final String gid;
+
+  Aria2NotificationObject({required this.gid});
+
+  Aria2NotificationObject.fromJson(Map<String, dynamic> json)
+    : this(gid: json['gid']);
+
+  @override
+  String toString() {
+    return (StringBuffer('$runtimeType(')
+          ..write('gid: $gid')
+          ..write(')'))
+        .toString();
   }
 }

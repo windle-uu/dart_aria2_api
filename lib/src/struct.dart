@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:aria2_api/src/enum.dart';
 import 'package:aria2_api/src/helper.dart';
-import 'package:aria2_api/src/response.dart';
 
 class Aria2BitTorrentData {
   final List<String> announceList;
@@ -1165,6 +1162,11 @@ class Aria2Method {
   final Aria2ParameterBuilder params;
 
   const Aria2Method(this.methodName, this.params);
+
+  @override
+  String toString() {
+    return 'Aria2Method(methodName: ${methodName.alias}, params: $params)';
+  }
 }
 
 abstract class Aria2ParameterBuilder {
@@ -1173,7 +1175,7 @@ abstract class Aria2ParameterBuilder {
   factory Aria2ParameterBuilder.empty() => const _Aria2EmptyParameterBuilder();
 
   factory Aria2ParameterBuilder.multicall(List<Aria2Method> parameterList) =>
-      _Aria2MulticallParameterBuilder(parameterList);
+      _Aria2MultiCallParameterBuilder(parameterList);
 
   factory Aria2ParameterBuilder.normal(List<dynamic> parameterList) =>
       _Aria2NormalParameterBuilder(parameterList);
@@ -1181,22 +1183,11 @@ abstract class Aria2ParameterBuilder {
   List<dynamic> get value;
 
   List<dynamic> buildParamList([String? secret]);
-}
 
-class Aria2WebSocketPacket {
-  final Aria2Method method;
-  final Completer<Aria2ClientResponse> _completer;
-
-  const Aria2WebSocketPacket(this.method, this._completer);
-
-  Future<Aria2ClientResponse> get future => _completer.future;
-
-  bool get isCompleted => _completer.isCompleted;
-
-  void errorComplete(Exception e) => _completer.complete(Aria2FaultResponse(e));
-
-  void methodComplete(Map<String, dynamic> json) =>
-      _completer.complete(Aria2MethodResponse.fromJson(method, json));
+  @override
+  String toString() {
+    return value.toString();
+  }
 }
 
 class _Aria2EmptyParameterBuilder extends Aria2ParameterBuilder {
@@ -1211,10 +1202,10 @@ class _Aria2EmptyParameterBuilder extends Aria2ParameterBuilder {
   }
 }
 
-class _Aria2MulticallParameterBuilder extends Aria2ParameterBuilder {
+class _Aria2MultiCallParameterBuilder extends Aria2ParameterBuilder {
   final List<Aria2Method> _value;
 
-  const _Aria2MulticallParameterBuilder(this._value);
+  const _Aria2MultiCallParameterBuilder(this._value);
 
   @override
   List<Aria2Method> get value => _value;
