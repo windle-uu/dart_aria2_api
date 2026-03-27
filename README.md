@@ -11,7 +11,7 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-# flutter_aria2_api
+# dart_aria2_api
 
 ---
 
